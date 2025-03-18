@@ -215,10 +215,17 @@ class InstancesFromHuggingFace(BaseModel, AbstractInstanceSource):
     def get_instance_configs(self) -> list[BatchInstance]:
         from datasets import load_dataset
 
+        # ds: list[dict[str, Any]] = load_dataset(self.dataset_name, split=self.split)  # type: ignore
+        # simple_instances: list[SimpleBatchInstance] = [SimpleBatchInstance.model_validate(instance) for instance in ds]
+        # instances = [instance.to_full_batch_instance(self.deployment) for instance in simple_instances]
+        # return _filter_batch_items(instances, filter_=self.filter, slice_=self.slice, shuffle=self.shuffle)
         ds: list[dict[str, Any]] = load_dataset(self.dataset_name, split=self.split)  # type: ignore
-        simple_instances: list[SimpleBatchInstance] = [SimpleBatchInstance.model_validate(instance) for instance in ds]
-        instances = [instance.to_full_batch_instance(self.deployment) for instance in simple_instances]
+        self.deployment.platform = "linux/amd64"
+        instances = [
+            SimpleBatchInstance.from_swe_bench(instance).to_full_batch_instance(self.deployment) for instance in ds
+        ]
         return _filter_batch_items(instances, filter_=self.filter, slice_=self.slice, shuffle=self.shuffle)
+
 
     @property
     def id(self) -> str:
@@ -257,11 +264,11 @@ class SWEBenchInstances(BaseModel, AbstractInstanceSource):
 
     def _get_huggingface_name(self) -> str:
         if self.subset == "full":
-            return "princeton-nlp/SWE-Bench"
+            return "eaalghamdi/predate"
         elif self.subset == "verified":
             return "princeton-nlp/SWE-Bench_Verified"
         elif self.subset == "lite":
-            return "princeton-nlp/SWE-Bench_Lite"
+            return "eaalghamdi/predate"
         msg = f"Unsupported subset: {self.subset}"
         raise ValueError(msg)
 
