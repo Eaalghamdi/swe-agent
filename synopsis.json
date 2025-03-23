@@ -1,0 +1,32 @@
+{
+    "astropy__astropy-12907": {
+      "new_file": 1,
+      "modifying_exisiting_file": 0,
+      "line_changes": [
+        {
+          "file_name": "main.py",
+          "lines_changed": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        }
+      ]
+    },
+    "astropy__astropy-13033": {
+      "new_file": 1,
+      "modifying_exisiting_file": 0,
+      "line_changes": [
+        {
+          "file_name": "main.py",
+          "lines_changed": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        }
+      ]
+    },
+    "astropy__astropy-13236": {
+      "new_file": 1,
+      "modifying_exisiting_file": 0,
+      "line_changes": [
+        {
+          "file_name": "main.py",
+          "lines_changed": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        }
+      ]
+    }
+  }

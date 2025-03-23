@@ -124,12 +124,40 @@ class GithubIssue(BaseModel):
     def get_extra_fields(self) -> dict[str, Any]:
         return self.extra_fields
 
+class GithubIssueSecure(BaseModel):
+    github_url: str
+    text: str
 
-ProblemStatementConfig = TextProblemStatement | GithubIssue | EmptyProblemStatement | FileProblemStatement
+    extra_fields: dict[str, Any] = Field(default_factory=dict)
+    """Any additional data to be added to the instance.
+    This data will be available when formatting prompt templates.
+    """
+
+    type: Literal["github_issue_secure"] = "github_issue_secure"
+    """Discriminator for (de)serialization/CLI. Do not change."""
+
+    id: str = None  # type: ignore
+
+    model_config = ConfigDict(extra="forbid")
+
+    def model_post_init(self, __context: Any) -> None:
+        if self.id is None:
+            logger.info("Setting problem statement based on github issue url")
+            owner, repo, issue_number = _parse_gh_issue_url(self.github_url)
+            self.id = f"{owner}__{repo}-i{issue_number}"
+
+    def get_problem_statement(self) -> str:
+        return self.text
+    
+    def get_extra_fields(self) -> dict[str, Any]:
+        return self.extra_fields
+
+
+ProblemStatementConfig = TextProblemStatement | GithubIssue | EmptyProblemStatement | FileProblemStatement | GithubIssueSecure
 
 
 def problem_statement_from_simplified_input(
-    *, input: str, type: Literal["text", "text_file", "github_issue"]
+    *, input: str, type: Literal["text", "text_file", "github_issue", "github_issue_secure"]
 ) -> ProblemStatementConfig:
     """Get a problem statement from an `input` string and a `type`.
 
@@ -143,6 +171,8 @@ def problem_statement_from_simplified_input(
         return FileProblemStatement(path=Path(input))
     elif type == "github_issue":
         return GithubIssue(github_url=input)
+    elif type == "github_issue_secure":
+        return GithubIssueSecure(github_url=input, text=input)
     else:
         msg = f"Unknown problem statement type: {type}"
         raise ValueError(msg)

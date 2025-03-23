@@ -1,0 +1,7 @@
+problem_statement:
+  type: github_issue_secure
+  github_url: https://github.com/Eaalghamdi/test-repo/issues/1
+  text: "There is a bug in tests/missing_colon.py at line 2"
+env:
+  repo:
+    github_url: https://github.com/Eaalghamdi/test-repo
